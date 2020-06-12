@@ -10,8 +10,8 @@ namespace TweetBook.Services
 {
     public interface IPostService
     {
-        Task<ActionResult<IEnumerable<Post>>> GetAllAsync();
-        Task<ActionResult<Post>> GetByIdAsync(Guid Id);
+        Task<ActionResult<IEnumerable<ResponsePost>>> GetAllAsync();
+        Task<ActionResult<ResponsePost>> GetByIdAsync(Guid Id);
         Task<ActionResult<Guid>> CreateAsync(CreatePostModel post);
         Task<ActionResult> UpdateAsync(UpdatePostModel post);
         Task<ActionResult> DeleteAsync(Guid Id);

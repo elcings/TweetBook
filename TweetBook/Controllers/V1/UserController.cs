@@ -45,7 +45,7 @@ namespace TweetBook.Controllers.V1
                 return BadRequest(users.FailureResult);
         }
 
-        [Route("users/getuser")]
+        [Route("users/getuserId")]
         [HttpGet]
         public async Task<IActionResult> GetUserID()
         {
@@ -81,8 +81,8 @@ namespace TweetBook.Controllers.V1
             return BadRequest(user.FailureResult);
         }
 
-        
-       
+
+        [AllowAnonymous]
         [HttpPost(ApiRoute.Users.Register)]
         public async Task<IActionResult> Register([FromBody]RegisterModel model)
         {

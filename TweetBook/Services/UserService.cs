@@ -93,19 +93,20 @@ namespace TweetBook.Services
             }
         }
 
-        public async Task<ActionResult<User>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<UserModel>> GetByIdAsync(Guid id)
         {
             try
             {
                 var user = await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == id);
+                var model = _mapper.Map<UserModel>(user);
                 if (user != null)
-                    return ActionResult<User>.Succeed(user);
+                    return ActionResult<UserModel>.Succeed(model);
                 else
-                    return ActionResult<User>.Failure("User not found");
+                    return ActionResult<UserModel>.Failure("User not found");
             }
             catch (Exception ex)
             {
-                return ActionResult<User>.Failure(ex.Message);
+                return ActionResult<UserModel>.Failure(ex.Message);
             }
             
         }
@@ -181,17 +182,17 @@ namespace TweetBook.Services
         {
             try
             {
-                var user = await GetByIdAsync(Id);
-                if (user.IsSucceed)
+                var user  = await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == Id);
+                if (user!=null)
                 {
                     if (!string.IsNullOrWhiteSpace(password))
                     {
                         byte[] passwordHash, passwordSalt;
                         CreatePasswordHash(password, out passwordHash, out passwordSalt);
-                        user.Data.PasswordHash = Convert.ToBase64String(passwordHash);
-                        user.Data.PasswordSalt = Convert.ToBase64String(passwordSalt);
+                        user.PasswordHash = Convert.ToBase64String(passwordHash);
+                        user.PasswordSalt = Convert.ToBase64String(passwordSalt);
 
-                        _dataContext.Users.Update(user.Data);
+                        _dataContext.Users.Update(user);
                         var changed = await _dataContext.SaveChangesAsync();
                         if (changed > 0)
                             return ActionResult.Succeed();
@@ -211,10 +212,10 @@ namespace TweetBook.Services
         {
             try
             {
-                var user = await GetByIdAsync(Id);
-                if (user.IsSucceed)
+                 var user = await _dataContext.Users.SingleOrDefaultAsync(x => x.Id == Id);
+                if (user!=null)
                 {
-                    _dataContext.Users.Remove(user.Data);
+                    _dataContext.Users.Remove(user);
                     var deleted = await _dataContext.SaveChangesAsync();
                     if (deleted > 0)
                         return ActionResult.Succeed();

@@ -26,6 +26,7 @@ namespace TweetBook.Installers
         {
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICacheService, InMemoryCacheService>();
         }
         private void RegisterMapper(IServiceCollection services)
         {

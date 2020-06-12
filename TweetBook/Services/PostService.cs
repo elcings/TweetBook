@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,12 @@ namespace TweetBook.Services
     {
         private DataContext _dataContext;
         private IMapper _mapper;
-        public PostService(DataContext dataContext,IMapper mapper)
+        private ICacheService _cacheService;
+        public PostService(DataContext dataContext,IMapper mapper,ICacheService cacheService)
         {
             _dataContext = dataContext;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
         public async Task<ActionResult<Guid>> CreateAsync(CreatePostModel post)
         {
@@ -40,32 +43,52 @@ namespace TweetBook.Services
 
         }
 
-        public async Task<ActionResult<Post>> GetByIdAsync(Guid Id)
+        public async Task<ActionResult<ResponsePost>> GetByIdAsync(Guid Id)
         {
             try
             {
-                var post = await _dataContext.Posts.SingleOrDefaultAsync(p => p.Id == Id);
-                if (post != null)
-                    return ActionResult<Post>.Succeed(post);
+                ResponsePost model;
+                if (_cacheService.TryGet<ResponsePost>(Id.ToString(), out model))
+                {
+                    return ActionResult<ResponsePost>.Succeed(model);
+                }
                 else
-                    return ActionResult<Post>.Failure("Post not found");
+                {
+                    var post = await _dataContext.Posts.SingleOrDefaultAsync(p => p.Id == Id);
+                    model = _mapper.Map<ResponsePost>(post);
+                    _cacheService.Set<ResponsePost>(Id.ToString(), model);
+                    if (model != null)
+                        return ActionResult<ResponsePost>.Succeed(model);
+                    else
+                        return ActionResult<ResponsePost>.Failure("Post not found");
+                }
             }
             catch (Exception ex)
             {
-                return ActionResult<Post>.Failure(ex.Message);
+                return ActionResult<ResponsePost>.Failure(ex.Message);
             }
         }
 
-        public async Task<ActionResult<IEnumerable<Post>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<ResponsePost>>> GetAllAsync()
         {
             try
             {
-                var users = await _dataContext.Posts.ToListAsync();
-                return ActionResult<IEnumerable<Post>>.Succeed(users);
+                IEnumerable<ResponsePost> modelList;
+                if (_cacheService.TryGet<IEnumerable<ResponsePost>>("posts",out modelList))
+                {
+                    return ActionResult<IEnumerable<ResponsePost>>.Succeed(modelList);
+                }
+                else {
+                    var posts = await _dataContext.Posts.ToListAsync();
+                     modelList = _mapper.Map<IEnumerable<ResponsePost>>(posts);
+                    _cacheService.Set<IEnumerable<ResponsePost>>("posts", modelList);
+                    return ActionResult<IEnumerable<ResponsePost>>.Succeed(modelList);
+                }
+               
             }
             catch (Exception ex)
             {
-                return ActionResult<IEnumerable<Post>>.Failure(ex.Message);
+                return ActionResult<IEnumerable<ResponsePost>>.Failure(ex.Message);
             }
 
         }
@@ -91,10 +114,10 @@ namespace TweetBook.Services
         {
             try
             {
-                var post = await GetByIdAsync(Id);
-                if (post.IsSucceed)
+                var post= await _dataContext.Posts.SingleOrDefaultAsync(x => x.Id == Id);
+                if (post!=null)
                 {
-                    _dataContext.Posts.Remove(post.Data);
+                    _dataContext.Posts.Remove(post);
                     var deleted = await _dataContext.SaveChangesAsync();
                     if (deleted > 0)
                         return ActionResult.Succeed();

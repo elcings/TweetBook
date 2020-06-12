@@ -1,0 +1,9 @@
+D:\VS2019\TweetBook\TweetBook.Contract\bin\Debug\netstandard2.0\TweetBook.Contract.deps.json
+D:\VS2019\TweetBook\TweetBook.Contract\bin\Debug\netstandard2.0\TweetBook.Contract.dll
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.AssemblyInfoInputs.cache
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.AssemblyInfo.cs
+D:\VS2019\TweetBook\TweetBook.Contract\bin\Debug\netstandard2.0\TweetBook.Contract.pdb
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.csprojAssemblyReference.cache
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.csproj.CoreCompileInputs.cache
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.dll
+D:\VS2019\TweetBook\TweetBook.Contract\obj\Debug\netstandard2.0\TweetBook.Contract.pdb

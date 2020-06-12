@@ -12,7 +12,7 @@ namespace TweetBook.Services
     {
         Task<ActionResult<ReturnUser>> Authenticate(string username, string password);
         Task<ActionResult<IEnumerable<UserModel>>> GetAllAsync();
-        Task<ActionResult<User>> GetByIdAsync(Guid id);
+        Task<ActionResult<UserModel>> GetByIdAsync(Guid id);
         Task<ActionResult<Guid>> Register(RegisterModel user, string password);
         Task<ActionResult> Update(UpdateUserModel user);
         Task<ActionResult> Delete(Guid Id);
