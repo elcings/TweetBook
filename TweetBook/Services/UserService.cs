@@ -22,11 +22,13 @@ namespace TweetBook.Services
         private readonly DataContext _dataContext;
         JwtSettings _jwtSettings;
         private IMapper _mapper;
-        public UserService(DataContext dataContext, JwtSettings jwtSettings, IMapper mapper)
+        private ICacheService _cacheService;
+        public UserService(DataContext dataContext, JwtSettings jwtSettings, IMapper mapper,ICacheService cacheService)
         {
             _dataContext = dataContext;
             _jwtSettings = jwtSettings;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
         public async Task<ActionResult<ReturnUser>> Authenticate(string email, string password)
         {
@@ -78,14 +80,19 @@ namespace TweetBook.Services
         {
             try
             {
-                var users = await _dataContext.Users.ToListAsync();
-                if (users != null)
+                 IEnumerable<UserModel> modelList;
+                 var cachekey = "GetAllAsync" + nameof(UserService);
+                if (_cacheService.TryGet<IEnumerable<UserModel>>(cachekey, out modelList))
                 {
-                    var models = _mapper.Map<IEnumerable<UserModel>>(users);
-                    return ActionResult<IEnumerable<UserModel>>.Succeed(models);
+                    return ActionResult<IEnumerable<UserModel>>.Succeed(modelList);
                 }
                 else
-                    return ActionResult<IEnumerable<UserModel>>.Failure("Any users does not exists");
+                {
+                    var users = await _dataContext.Users.ToListAsync();
+                    modelList = _mapper.Map<IEnumerable<UserModel>>(users);
+                    _cacheService.Set<IEnumerable<UserModel>>(cachekey, modelList);
+                    return ActionResult<IEnumerable<UserModel>>.Succeed(modelList);
+                }
             }
             catch (Exception ex)
             {
