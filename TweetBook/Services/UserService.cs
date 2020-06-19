@@ -30,51 +30,95 @@ namespace TweetBook.Services
             _mapper = mapper;
             _cacheService = cacheService;
         }
-        public async Task<ActionResult<ReturnUser>> Authenticate(string email, string password)
+        public async Task<ActionResult<AuthenticateResponse>> Authenticate(AuthenticateModel model, string ipAddress)
         {
             try
             {
-                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-                    return ActionResult<ReturnUser>.Failure("Email is empty");
+                if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+                    return ActionResult<AuthenticateResponse>.Failure("Email is empty");
 
-                var user = await _dataContext.Users.SingleOrDefaultAsync(x => x.Email == email);
+                var user = await _dataContext.Users.SingleOrDefaultAsync(x => x.Email == model.Email);
 
                 if (user == null)
-                    return ActionResult<ReturnUser>.Failure("User does not exist");
+                    return ActionResult<AuthenticateResponse>.Failure("User does not exist");
 
-                if (!VerifyPasswordHash(password, Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(user.PasswordSalt)))
-                    return ActionResult<ReturnUser>.Failure("Password is not correct");
+                if (!VerifyPasswordHash(model.Password, Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(user.PasswordSalt)))
+                    return ActionResult<AuthenticateResponse>.Failure("Password is not correct");
 
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
-                    new Claim("Id", user.Id.ToString())
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                var tokenString = tokenHandler.WriteToken(token);
-                return ActionResult<ReturnUser>.Succeed(new ReturnUser
+                var jwtToken = generateJwtToken(user);
+                var refreshToken = generateRefreshToken(ipAddress);
+                return ActionResult<AuthenticateResponse>.Succeed(new AuthenticateResponse
                 {
                     Id = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
-                    Token = tokenString
+                    Token = jwtToken,
+                    RefreshToken=refreshToken.Token
                 });
             }
             catch (Exception ex)
             {
-                return ActionResult<ReturnUser>.Failure(ex.Message);
+                return ActionResult<AuthenticateResponse>.Failure(ex.Message);
             }
            
         }
+
+        public async Task<AuthenticateResponse> RefreshToken(string token, string ipAddress)
+        {
+            var user = await _dataContext.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            // return null if no user found with token
+            if (user == null) return null;
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+            // return null if token is no longer active
+            if (!refreshToken.IsActive) return null;
+
+            // replace old refresh token with a new one and save
+            var newRefreshToken = generateRefreshToken(ipAddress);
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.ReplacedByToken = newRefreshToken.Token;
+            user.RefreshTokens.Add(newRefreshToken);
+            _dataContext.Update(user);
+            _dataContext.SaveChanges();
+
+            // generate new jwt
+            var jwtToken = generateJwtToken(user);
+
+            return new AuthenticateResponse 
+            { 
+                Token=jwtToken,
+                RefreshToken=newRefreshToken.Token,
+                FirstName=user.FirstName,
+                LastName=user.LastName,
+                Email=user.Email
+            };
+        }
+
+        public async Task<bool> RevokeToken(string token, string ipAddress)
+        {
+            var user = _dataContext.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            // return false if no user found with token
+            if (user == null) return false;
+
+            var refreshToken = user.Result.RefreshTokens.Single(x => x.Token == token);
+
+            // return false if token is not active
+            if (!refreshToken.IsActive) return false;
+
+            // revoke token and save
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = ipAddress;
+            _dataContext.Update(user);
+            _dataContext.SaveChanges();
+
+            return true;
+        }
+
 
         public async Task<ActionResult<IEnumerable<UserModel>>> GetAllAsync()
         {
@@ -295,6 +339,44 @@ namespace TweetBook.Services
 
             return true;
         }
+
+        private string generateJwtToken(User user)
+        {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.FirstName+" "+user.LastName),
+                    new Claim("Id", user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        private RefreshToken generateRefreshToken(string ipAddress)
+        {
+            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
+            {
+                var randomBytes = new byte[64];
+                rngCryptoServiceProvider.GetBytes(randomBytes);
+                return new RefreshToken
+                {
+                    Token = Convert.ToBase64String(randomBytes),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Created = DateTime.UtcNow,
+                    CreatedByIp = ipAddress
+                };
+            }
+        }
+
+       
 
         #endregion
 

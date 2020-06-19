@@ -11,7 +11,7 @@ namespace TweetBook.Sdk
     public interface ITweetBokkApi
     {
         [Get("/api/v1/posts")]
-        Task<IEnumerable<ResponsePost>> GetAll();
+        Task<List<ResponsePost>> GetAll();
         [Get("/api/v1/posts{postId}")]
         Task<ResponsePost> Get(Guid postId);
         [Post("/api/v1/posts/add")]

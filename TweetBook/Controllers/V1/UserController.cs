@@ -6,7 +6,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Bogus.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TweetBook.Common;
 using TweetBook.Contract.V1;
@@ -28,7 +30,7 @@ namespace TweetBook.Controllers.V1
         public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
             var guid = Guid.NewGuid();
-            var token = await _userService.Authenticate(model.Username, model.Password);
+            var token = await _userService.Authenticate(model,ipAddress());
 
             if (token.IsSucceed)
                 return Ok(token.Data);
@@ -40,7 +42,7 @@ namespace TweetBook.Controllers.V1
         {
             var users = await _userService.GetAllAsync();
             if (users.IsSucceed)
-                return Ok(users);
+                return Ok(users.Data);
             else
                 return BadRequest(users.FailureResult);
         }
@@ -57,7 +59,7 @@ namespace TweetBook.Controllers.V1
         {
             var user = await _userService.GetByIdAsync(Id);
             if (user.IsSucceed)
-                return Ok(user);
+                return Ok(user.Data);
             return BadRequest(user.FailureResult);
         }
 
@@ -117,6 +119,64 @@ namespace TweetBook.Controllers.V1
                 return Ok();
             return BadRequest(deleted.FailureResult);
 
+        }
+        [AllowAnonymous]
+        [HttpPost("refresh-token")]
+        public IActionResult RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var response = _userService.RefreshToken(refreshToken, ipAddress());
+
+            if (response == null)
+                return Unauthorized(new { message = "Invalid token" });
+
+            setTokenCookie(response.Result.RefreshToken);
+
+            return Ok(response);
+        }
+
+        [HttpPost("revoke-token")]
+        public async Task< IActionResult> RevokeToken([FromBody] RevokeTokenRequest model)
+        {
+            // accept token from request body or cookie
+            var token = model.Token ?? Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(token))
+                return BadRequest(new { message = "Token is required" });
+
+            var response = await _userService.RevokeToken(token, ipAddress());
+
+            if (!response)
+                return NotFound(new { message = "Token not found" });
+
+            return Ok(new { message = "Token revoked" });
+        }
+
+
+
+        [HttpGet("{id}/refresh-tokens")]
+        public async Task<IActionResult> GetRefreshTokens(Guid id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            return Ok(user.Data.RefreshTokens);
+        }
+
+        private void setTokenCookie(string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", token, cookieOptions);
+        }
+
+        private string ipAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+            else
+                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
 
 

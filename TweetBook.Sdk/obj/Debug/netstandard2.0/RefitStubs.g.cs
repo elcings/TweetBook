@@ -58,19 +58,35 @@ namespace TweetBook.Sdk
         }
 
         /// <inheritdoc />
-        Task<ReturnUser> IIdentityApi.Register(RegisterModel model)
+        Task<AuthenticateResponse> IIdentityApi.Register(RegisterModel model)
         {
             var arguments = new object[] { model };
             var func = requestBuilder.BuildRestResultFuncForMethod("Register", new Type[] { typeof(RegisterModel) });
-            return (Task<ReturnUser>)func(Client, arguments);
+            return (Task<AuthenticateResponse>)func(Client, arguments);
         }
 
         /// <inheritdoc />
-        Task<ReturnUser> IIdentityApi.Login(AuthenticateModel model)
+        Task<AuthenticateResponse> IIdentityApi.Login(AuthenticateModel model)
         {
             var arguments = new object[] { model };
             var func = requestBuilder.BuildRestResultFuncForMethod("Login", new Type[] { typeof(AuthenticateModel) });
-            return (Task<ReturnUser>)func(Client, arguments);
+            return (Task<AuthenticateResponse>)func(Client, arguments);
+        }
+
+        /// <inheritdoc />
+        Task<UserModel> IIdentityApi.GetById(Guid Id)
+        {
+            var arguments = new object[] { Id };
+            var func = requestBuilder.BuildRestResultFuncForMethod("GetById", new Type[] { typeof(Guid) });
+            return (Task<UserModel>)func(Client, arguments);
+        }
+
+        /// <inheritdoc />
+        Task<IEnumerable<UserModel>> IIdentityApi.GetAll()
+        {
+            var arguments = new object[] {  };
+            var func = requestBuilder.BuildRestResultFuncForMethod("GetAll", new Type[] {  });
+            return (Task<IEnumerable<UserModel>>)func(Client, arguments);
         }
     }
 }
@@ -103,6 +119,22 @@ namespace TweetBook.Sdk
         }
 
         /// <inheritdoc />
+        Task<List<ResponsePost>> ITweetBokkApi.GetAll()
+        {
+            var arguments = new object[] {  };
+            var func = requestBuilder.BuildRestResultFuncForMethod("GetAll", new Type[] {  });
+            return (Task<List<ResponsePost>>)func(Client, arguments);
+        }
+
+        /// <inheritdoc />
+        Task<ResponsePost> ITweetBokkApi.Get(Guid postId)
+        {
+            var arguments = new object[] { postId };
+            var func = requestBuilder.BuildRestResultFuncForMethod("Get", new Type[] { typeof(Guid) });
+            return (Task<ResponsePost>)func(Client, arguments);
+        }
+
+        /// <inheritdoc />
         Task<CreatePostModel> ITweetBokkApi.CreatePost(CreatePostModel model)
         {
             var arguments = new object[] { model };
@@ -111,26 +143,18 @@ namespace TweetBook.Sdk
         }
 
         /// <inheritdoc />
-        Task<CreatePostModel> ITweetBokkApi.GetAll()
-        {
-            var arguments = new object[] {  };
-            var func = requestBuilder.BuildRestResultFuncForMethod("GetAll", new Type[] {  });
-            return (Task<CreatePostModel>)func(Client, arguments);
-        }
-
-        /// <inheritdoc />
-        Task<CreatePostModel> ITweetBokkApi.Get(Guid postId)
-        {
-            var arguments = new object[] { postId };
-            var func = requestBuilder.BuildRestResultFuncForMethod("Get", new Type[] { typeof(Guid) });
-            return (Task<CreatePostModel>)func(Client, arguments);
-        }
-
-        /// <inheritdoc />
         Task<CreatePostModel> ITweetBokkApi.UpdatePost(Guid postId, UpdatePostModel model)
         {
             var arguments = new object[] { postId, model };
             var func = requestBuilder.BuildRestResultFuncForMethod("UpdatePost", new Type[] { typeof(Guid), typeof(UpdatePostModel) });
+            return (Task<CreatePostModel>)func(Client, arguments);
+        }
+
+        /// <inheritdoc />
+        Task<CreatePostModel> ITweetBokkApi.RemovePost(Guid postId)
+        {
+            var arguments = new object[] { postId };
+            var func = requestBuilder.BuildRestResultFuncForMethod("RemovePost", new Type[] { typeof(Guid) });
             return (Task<CreatePostModel>)func(Client, arguments);
         }
     }

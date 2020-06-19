@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -16,6 +17,9 @@ namespace TweetBook.Domain
         public string PasswordHash { get; set; }
         public string PasswordSalt { get; set; }
         public ICollection<UserRole> UserRoles { get; set; }
+
+        [JsonIgnore]
+        public List<RefreshToken> RefreshTokens { get; set; }
 
     }
 }

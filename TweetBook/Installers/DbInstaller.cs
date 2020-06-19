@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +27,10 @@ namespace TweetBook.Installers
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICacheService, InMemoryCacheService>();
+#if !DEBUG
             services.AddScoped<ICacheService, RedisCacheService>();
+#endif
+
         }
         private void RegisterMapper(IServiceCollection services)
         {

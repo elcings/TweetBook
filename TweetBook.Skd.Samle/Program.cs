@@ -1,5 +1,8 @@
-﻿using Refit;
+﻿using Newtonsoft.Json;
+using Refit;
+using System;
 using System.Threading.Tasks;
+using TweetBook.Contract.V1.Models;
 using TweetBook.Sdk;
 
 namespace TweetBook.Skd.Samle
@@ -23,7 +26,7 @@ namespace TweetBook.Skd.Samle
             //});
             var login =await identityApi.Login(new Contract.V1.Models.AuthenticateModel
             {
-                Username = "elcinaliyevgs@gmail.com",
+                Email = "elcinaliyevgs@gmail.com",
                 Password = "elcings85"
             });
 
@@ -33,6 +36,12 @@ namespace TweetBook.Skd.Samle
                 Title = "Elcin Refit",
                 Content = "jhdgadgajahgdjagajdgajdahgdhghagdajdgakdjaada;d;aakj;adajkjkjkjkjkjkk"
             });
+            var posts = await tweetBookApi.GetAll();
+
+          
+            posts.ForEach(c=>  Console.WriteLine($"{c.Title}-{c.Content}"));
+            Console.ReadLine();
+
         }
     }
 }

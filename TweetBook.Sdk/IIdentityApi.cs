@@ -10,11 +10,14 @@ namespace TweetBook.Sdk
     public interface IIdentityApi
     {
         [Post("/api/v1/users/register")]
-        Task<ReturnUser> Register([Body]RegisterModel model);
+        Task<AuthenticateResponse> Register([Body]RegisterModel model);
+
         [Post("/api/v1/users/authenticate")]
-        Task<ReturnUser> Login([Body]AuthenticateModel model);
+        Task<AuthenticateResponse> Login([Body]AuthenticateModel model);
+
         [Get("/api/v1/users{Id}")]
         Task<UserModel> GetById(Guid Id);
+
         [Get("/api/v1/users")]
         Task<IEnumerable<UserModel>> GetAll();
     }

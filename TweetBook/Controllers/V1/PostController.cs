@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TweetBook.Common;
 using TweetBook.Contract.V1;
 using TweetBook.Contract.V1.Models;
@@ -29,7 +30,7 @@ namespace TweetBook.Controllers.V1
         {
             var posts = await _postService.GetAllAsync();
             if (posts.IsSucceed)
-                return Ok(posts);
+                return Ok(posts.Data);
             return BadRequest(posts.FailureResult);
         }
 
@@ -39,7 +40,7 @@ namespace TweetBook.Controllers.V1
         {
             var post = await _postService.GetByIdAsync(postId);
             if (post.IsSucceed)
-                return Ok(post);
+                return Ok(post.Data);
             return BadRequest(post.FailureResult);
         }
 
@@ -64,6 +65,9 @@ namespace TweetBook.Controllers.V1
         [HttpPost(ApiRoute.Posts.Create)]
         public async Task<IActionResult> Create([FromBody]CreatePostModel post)
         {
+            if (!ModelState.IsValid)
+            { 
+            }
             var createdId= await _postService.CreateAsync(post);
             if (createdId.IsSucceed)
             {

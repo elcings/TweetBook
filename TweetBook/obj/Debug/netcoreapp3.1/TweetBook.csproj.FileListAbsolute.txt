@@ -289,6 +289,14 @@ D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\System.IO.Pipelines.dll
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\FluentValidation.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\FluentValidation.AspNetCore.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\FluentValidation.DependencyInjectionExtensions.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Diagnostics.HealthChecks.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.FileProviders.Abstractions.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Hosting.Abstractions.dll
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.csproj.CoreCompileInputs.cache
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.MvcApplicationPartsAssemblyInfo.cs
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.MvcApplicationPartsAssemblyInfo.cache

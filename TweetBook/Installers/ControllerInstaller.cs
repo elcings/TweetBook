@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TweetBook.Options;
@@ -17,6 +20,11 @@ namespace TweetBook.Installers
             configuration.Bind(nameof(JwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
             services.AddControllers();
+            services.AddMvc(options => { 
+                options.EnableEndpointRouting = false;
+            })
+                .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(configuration.GetValue<string>("Redis:Server")));
 
             services.AddAuthentication(x =>
             {
@@ -33,7 +41,8 @@ namespace TweetBook.Installers
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ClockSkew=TimeSpan.Zero
                 };
             });
             services.AddSwaggerGen(x =>
