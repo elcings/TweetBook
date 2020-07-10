@@ -162,16 +162,16 @@ namespace TweetBook.Services
             
         }
 
-        public async Task<ActionResult<Guid>> Register(RegisterModel model, string password)
+        public async Task<ActionResult<AuthenticateResponse>> Register(RegisterModel model, string password)
         {
             try
             {
                 var dto = _mapper.Map<User>(model);
                 dto.Id = Guid.NewGuid();
                 if (_dataContext.Users.Any(x => x.Email == dto.Email))
-                    return ActionResult<Guid>.Failure("Username \"" + dto.Email + "\" is already taken");
+                    return ActionResult<AuthenticateResponse>.Failure("Username \"" + dto.Email + "\" is already taken");
                 if (string.IsNullOrWhiteSpace(password))
-                    return ActionResult<Guid>.Failure("Password is required");
+                    return ActionResult<AuthenticateResponse>.Failure("Password is required");
 
                 byte[] passwordHash, passwordSalt;
                 CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -181,14 +181,22 @@ namespace TweetBook.Services
                 await _dataContext.Users.AddAsync(dto);
                 var added = await _dataContext.SaveChangesAsync();
                 if (added > 0)
-                    return ActionResult<Guid>.Succeed(dto.Id);
-                else
-                    return ActionResult<Guid>.Failure("Problem  occured");
-
+                {
+                    var jwtToken = generateJwtToken(dto);
+                    return ActionResult<AuthenticateResponse>.Succeed(new AuthenticateResponse
+                    {
+                        Id = dto.Id,
+                        FirstName = dto.FirstName,
+                        LastName = dto.LastName,
+                        Email = dto.Email,
+                        Token = jwtToken
+                    });
+                }
+              return  ActionResult<AuthenticateResponse>.Failure("Problem occured");
             }
             catch (Exception ex)
             {
-                return ActionResult<Guid>.Failure(ex.Message);
+                return ActionResult<AuthenticateResponse>.Failure(ex.Message);
             }
 
         }

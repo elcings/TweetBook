@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Bogus;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TweetBook.Common;
 using TweetBook.Contract.V1;
 using TweetBook.Contract.V1.Models;
@@ -71,9 +67,7 @@ namespace TweetBook.Controllers.V1
             var createdId= await _postService.CreateAsync(post);
             if (createdId.IsSucceed)
             {
-                string baseUri = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-                string createdUri = baseUri + "/" + ApiRoute.Posts.Get.Replace("{postId}", createdId.Data.ToString());
-                return Created(createdUri, post);
+                return Ok(createdId.Data);
             }
             return BadRequest(createdId.FailureResult);
         }

@@ -279,8 +279,6 @@ D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\staticwebassets\TweetBook.
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.dll
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.pdb
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.genruntimeconfig.cache
-D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\TweetBook.Contract.dll
-D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\TweetBook.Contract.pdb
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Pipelines.Sockets.Unofficial.dll
 D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\StackExchange.Redis.dll
@@ -300,3 +298,5 @@ D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Hosti
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.csproj.CoreCompileInputs.cache
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.MvcApplicationPartsAssemblyInfo.cs
 D:\VS2019\TweetBook\TweetBook\obj\Debug\netcoreapp3.1\TweetBook.MvcApplicationPartsAssemblyInfo.cache
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\TweetBook.Contract.dll
+D:\VS2019\TweetBook\TweetBook\bin\Debug\netcoreapp3.1\TweetBook.Contract.pdb

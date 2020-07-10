@@ -62,21 +62,21 @@ namespace TweetBook.Services
             }
         }
 
-        public void RemoveByPrefix(string prefix)
-        {
-            lock (Sync)
-            {
-                var keysToRemove =
-                    Cache
-                        .Where(c => c.Key.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
-                        .Select(c => c.Key)
-                        .ToList();
+        //public void RemoveByPrefix(string prefix)
+        //{
+        //    lock (Sync)
+        //    {
+        //        var keysToRemove =
+        //            Cache
+        //                .Where(c => c.Key.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+        //                .Select(c => c.Key)
+        //                .ToList();
 
-                foreach (var key in keysToRemove)
-                {
-                    Cache.Remove(key);
-                }
-            }
-        }
+        //        foreach (var key in keysToRemove)
+        //        {
+        //            Cache.Remove(key);
+        //        }
+        //    }
+        //}
     }
 }

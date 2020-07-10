@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using Refit;
+﻿using Refit;
 using System;
 using System.Threading.Tasks;
-using TweetBook.Contract.V1.Models;
 using TweetBook.Sdk;
 
 namespace TweetBook.Skd.Samle

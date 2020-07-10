@@ -11,6 +11,5 @@ namespace TweetBook.Services
         bool Set<T>(string cacheKey, T value);
         bool Set<T>(string cacheKey, T value, DateTimeOffset expire);
         void Clear();
-        void RemoveByPrefix(string prefix);
     }
 }

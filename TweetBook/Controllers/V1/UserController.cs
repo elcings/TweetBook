@@ -29,7 +29,6 @@ namespace TweetBook.Controllers.V1
         [HttpPost(ApiRoute.Users.Authenticate)]
         public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
-            var guid = Guid.NewGuid();
             var token = await _userService.Authenticate(model,ipAddress());
 
             if (token.IsSucceed)
@@ -91,9 +90,7 @@ namespace TweetBook.Controllers.V1
             var created = await _userService.Register(model, model.Password);
             if (created.IsSucceed)
             {
-                string baseUri = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-                string createdUri = baseUri + "/" + ApiRoute.Users.Get.Replace("{Id}", created.Data.ToString());
-                return Created(createdUri, model);
+                return Ok(created.Data);
             }
             else
                 return BadRequest(created.FailureResult);
